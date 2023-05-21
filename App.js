@@ -1,20 +1,20 @@
-// src/App.js
-import React, { useState } from 'react';
-import Login from './components/Login';
-import UserDashboard from './components/UserDashboard';
+import React from "react";
+import { NavigationContainer } from "@react-navigation/native";
+import { createStackNavigator } from "@react-navigation/stack";
+import LoginPage from "./LoginPage";
+import CoursePage from "./CoursePage";
+import LessonPage from "./LessonPage";
 
-const App = () => {
-const [userData, setUserData] = useState(null);
+const Stack = createStackNavigator();
 
-return (
-<div>
-{!userData ? (
-<Login setUserData={setUserData} />
-) : (
-<UserDashboard userData={userData} />
-)}
-</div>
-);
-};
-
-export default App;
+export default function App() {
+  return (
+    <NavigationContainer>
+      <Stack.Navigator initialRouteName="Login">
+        <Stack.Screen name="Login" component={LoginPage} />
+        <Stack.Screen name="Courses" component={CoursePage} />
+        <Stack.Screen name="Lessons" component={LessonPage} />
+      </Stack.Navigator>
+    </NavigationContainer>
+  );
+}
