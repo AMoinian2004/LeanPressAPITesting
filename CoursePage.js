@@ -1,18 +1,20 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, StyleSheet, Pressable } from "react-native";
-import axios from "axios";
+import React from "react";
+import { View, StyleSheet, Pressable, Text } from "react-native";
 
 const CoursePage = ({ navigation, route }) => {
-  const allCourses = route.params.allCourses;
+  const { allCourses, accessToken } = route.params; // Retrieve the accessToken from route params
+
+  const handleCoursePress = (course) => {
+    navigation.navigate("Lessons", { courseId: course.id, accessToken }); // Pass the course ID and accessToken to the Lessons screen
+  };
 
   return (
     <View>
       {allCourses.map((course) => (
         <Pressable
           key={course.id}
-          onPress={() =>
-            navigation.navigate("Lessons", { courseId: course.id })
-          }
+          onPress={() => handleCoursePress(course)}
+          style={styles.courseContainer}
         >
           <Text>{course.name}</Text>
         </Pressable>
@@ -20,5 +22,13 @@ const CoursePage = ({ navigation, route }) => {
     </View>
   );
 };
+
+const styles = StyleSheet.create({
+  courseContainer: {
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc"
+  }
+});
 
 export default CoursePage;
