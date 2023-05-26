@@ -22,7 +22,7 @@ const LoginPage = ({ navigation }) => {
       if (validationStatus === 200) {
         finalToken = resToken;
         allCourses = await getAllCourses(finalToken);
-        navigation.navigate("Courses", { allCourses });
+        navigation.navigate("Courses", { allCourses, accessToken: resToken });
       }
 
       console.log(allCourses[0].name);
