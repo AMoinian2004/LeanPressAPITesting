@@ -1,64 +1,57 @@
-import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Text, TouchableOpacity } from "react-native";
+import React, { useEffect, useState } from "react";
+import { View, FlatList, Text, Pressable, StyleSheet } from "react-native";
 import axios from "axios";
 
-const LessonPage = ({ route, navigation }) => {
+const LessonPage = ({ navigation, route }) => {
   const { courseId, accessToken } = route.params;
-  const [lessonData, setLessonData] = useState([]);
+  const [lessons, setLessons] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
   useEffect(() => {
-    const fetchData = async () => {
+    const getLessons = async () => {
       try {
         const response = await axios.get(
-          "https://myselena.org/wp-json/learnpress/v1/lessons",
+          `https://myselena.org/wp-json/learnpress/v1/courses/${courseId}`,
           {
             headers: {
               Authorization: `Bearer ${accessToken}`
-            },
-            params: {
-              context: "view",
-              per_page: 10,
-              include: [courseId]
             }
           }
         );
-        setLessonData(response.data);
-      } catch (err) {
-        console.error(err);
-        setError(err.toString());
+        const lessonsResponse = response.data.sections[0].items;
+        setLessons(lessonsResponse);
+      } catch (error) {
+        console.log(error);
+        setError(error.toString());
       } finally {
         setLoading(false);
       }
     };
 
-    fetchData();
-  }, [accessToken, courseId]);
+    getLessons();
+  }, [courseId, accessToken]);
 
-  const handleLessonPress = (lesson) => {
-    // Navigate to the LessonDetail screen with the lesson data
-    navigation.navigate("LessonDetail", { lesson });
+  const goToLesson = (lesson) => {
+    navigation.navigate("Lesson", { lessonId: lesson.id, token: accessToken });
   };
 
   return (
     <View style={styles.container}>
-      <Text style={styles.courseName}>Course: {courseId}</Text>
       {loading ? (
-        <Text>Loading lesson data...</Text>
+        <Text>Loading lessons...</Text>
       ) : error ? (
         <Text>{error}</Text>
       ) : (
-        lessonData.map((lesson) => (
-          <TouchableOpacity
-            key={lesson.id}
-            onPress={() => handleLessonPress(lesson)}
-          >
-            <View>
-              <Text style={styles.lessonName}>{lesson.name}</Text>
-            </View>
-          </TouchableOpacity>
-        ))
+        <FlatList
+          data={lessons}
+          renderItem={({ item }) => (
+            <Pressable onPress={() => goToLesson(item)}>
+              <Text style={styles.input}>{item.title}</Text>
+            </Pressable>
+          )}
+          keyExtractor={(item) => item.id.toString()}
+        />
       )}
     </View>
   );
@@ -67,16 +60,22 @@ const LessonPage = ({ route, navigation }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10
+    justifyContent: "center",
+    alignItems: "center",
+    backgroundColor: "#fdf7fa"
   },
-  courseName: {
-    fontSize: 18,
+  input: {
+    fontSize: 24,
+    padding: 20,
+    textAlign: "center",
+    width: "90%",
+    backgroundColor: "#57cc99",
     fontWeight: "bold",
-    marginBottom: 10
+    color: "#fdf7fa",
+    marginBottom: 8
   },
-  lessonName: {
-    fontWeight: "bold",
-    marginBottom: 5
+  border: {
+    borderRadius: 30
   }
 });
 
