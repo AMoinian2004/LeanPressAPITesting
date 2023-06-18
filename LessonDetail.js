@@ -1,51 +1,27 @@
-import React, { useState, useEffect } from "react";
-import { View, StyleSheet, Text } from "react-native";
-import axios from "axios";
+import React, { useEffect, useState } from "react";
+import { View, Text, StyleSheet } from "react-native";
 
 const LessonDetail = ({ route }) => {
-  const { lessonId, accessToken } = route.params;
-  const [lesson, setLesson] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [error, setError] = useState(null);
+  const { url } = route.params;
+  const [pdfLink, setPdfLink] = useState("");
 
   useEffect(() => {
-    const fetchLesson = async () => {
-      try {
-        const response = await axios.get(
-          `https://myselena.org/wp-json/learnpress/v1/lessons/${lessonId}`,
-          {
-            headers: {
-              Authorization: `Bearer ${accessToken}`,
-            },
-            params: {
-              context: "view",
-            },
-          }
-        );
-        setLesson(response.data);
-      } catch (err) {
-        console.error(err);
-        setError(err.toString());
-      } finally {
-        setLoading(false);
+    const extractPdfLink = () => {
+      const regex = /href="(.*?)"/;
+      const match = regex.exec(url);
+      if (match && match[1]) {
+        const link = match[1];
+        setPdfLink(link);
+        console.log("PDF Link:", link);
       }
     };
 
-    fetchLesson();
-  }, [accessToken, lessonId]);
-
-  if (loading) {
-    return <Text>Loading lesson data...</Text>;
-  }
-
-  if (error) {
-    return <Text>{error}</Text>;
-  }
+    extractPdfLink();
+  }, []);
 
   return (
     <View style={styles.container}>
-      <Text style={styles.lessonName}>{lesson.name}</Text>
-      <Text>{lesson.content}</Text>
+      <Text>PDF Link: {pdfLink}</Text>
     </View>
   );
 };
@@ -53,13 +29,9 @@ const LessonDetail = ({ route }) => {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    padding: 10,
-  },
-  lessonName: {
-    fontSize: 18,
-    fontWeight: "bold",
-    marginBottom: 10,
-  },
+    justifyContent: "center",
+    alignItems: "center"
+  }
 });
 
 export default LessonDetail;
