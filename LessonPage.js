@@ -32,8 +32,12 @@ const LessonPage = ({ navigation, route }) => {
     getLessons();
   }, [courseId, accessToken]);
 
-  const goToLesson = (lesson) => {
-    navigation.navigate("Lesson", { lessonId: lesson.id, token: accessToken });
+  const goToLessonDetail = (lesson) => {
+    const lessonContent = lesson.content;
+    const urlPattern = /href="(.*?)"/;
+    const urlMatch = urlPattern.exec(lessonContent);
+    const url = urlMatch && urlMatch[1] ? urlMatch[1] : "";
+    navigation.navigate("LessonDetail", { url });
   };
 
   return (
@@ -46,7 +50,7 @@ const LessonPage = ({ navigation, route }) => {
         <FlatList
           data={lessons}
           renderItem={({ item }) => (
-            <Pressable onPress={() => goToLesson(item)}>
+            <Pressable onPress={() => goToLessonDetail(item)}>
               <Text style={styles.input}>{item.title}</Text>
             </Pressable>
           )}
@@ -59,19 +63,13 @@ const LessonPage = ({ navigation, route }) => {
 
 const styles = StyleSheet.create({
   container: {
-    flex: 1,
-    justifyContent: "center",
-    alignItems: "center",
-    backgroundColor: "#fdf7fa"
+    padding: 10,
+    borderBottomWidth: 1,
+    borderBottomColor: "#ccc"
   },
   input: {
     fontSize: 24,
-    padding: 20,
-    textAlign: "center",
-    width: "90%",
-    backgroundColor: "#57cc99",
-    fontWeight: "bold",
-    color: "#fdf7fa",
+    padding: 10,
     marginBottom: 8
   },
   border: {
