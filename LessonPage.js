@@ -4,7 +4,7 @@ import axios from "axios";
 
 const LessonPage = ({ navigation, route }) => {
   const { courseId, accessToken } = route.params;
-  const [lessons, setLessons] = useState([]);
+  const [lessons, setLessons] = useState({});
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(null);
 
@@ -30,14 +30,10 @@ const LessonPage = ({ navigation, route }) => {
     };
 
     getLessons();
-  }, [courseId, accessToken]);
+  }, []);
 
   const goToLessonDetail = (lesson) => {
-    const lessonContent = lesson.content;
-    const urlPattern = /href="(.*?)"/;
-    const urlMatch = urlPattern.exec(lessonContent);
-    const url = urlMatch && urlMatch[1] ? urlMatch[1] : "";
-    navigation.navigate("LessonDetail", { url });
+    navigation.navigate("LessonDetail", { lessonId: lesson.id, accessToken });
   };
 
   return (
